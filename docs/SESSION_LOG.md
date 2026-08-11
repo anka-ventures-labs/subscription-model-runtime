@@ -35,3 +35,7 @@
 - Andy and Krow are intentionally not migrated in this commit. The staged
   migration plan keeps their current transports until parity fixtures pass, so
   extraction does not disrupt active product work.
+- Repository checkpoint: the architecture, operating boundaries, migration
+  plan, and verification record were committed first on the base branch. The
+  runtime implementation, provider drivers, executable fixtures, and test suite
+  follow as a separately reviewable feature commit.
