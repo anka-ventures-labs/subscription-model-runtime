@@ -1,0 +1,32 @@
+{
+  "name": "subscription-model-runtime",
+  "version": "0.1.0",
+  "description": "Provider-neutral local runtime for subscription-authenticated model CLIs",
+  "type": "module",
+  "private": true,
+  "files": [
+    "src",
+    "README.md",
+    "ARCHITECTURE.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "bin": {
+    "smr": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test 'test/**/*.test.js'",
+    "example": "node examples/basic.js"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  }
+}
