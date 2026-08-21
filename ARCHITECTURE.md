@@ -62,6 +62,14 @@ both forms and avoid replaying the final result after streaming it.
 - `invalid_output`
 - `schema_validation`
 
+Stderr-derived kinds (`quota`, `authentication`, `model_unavailable`) are a
+heuristic over untrusted provider output and are only considered when the
+process exited nonzero. The patterns require a failure phrase on word
+boundaries within a single line; routine log text such as `token usage: 1234`
+or `authoring complete` must classify as `provider_failure`, never as
+`authentication`, because callers map that kind to 401 and upstream proxies may
+disable a healthy deployment on it.
+
 Errors retain bounded diagnostics and `partialText`. Prompts, tool inputs, CLI
 arguments, credentials, and raw provider event streams are not placed in
 normalized events. Raw provider stderr is returned as `diagnostics` and may
@@ -84,3 +92,20 @@ echo provider arguments; callers must treat it as sensitive.
 10. The library is local/internal tooling, not a production serving gateway.
 11. The default child environment is allowlisted; unrelated parent-process
     secrets are not inherited. Explicit environment additions remain possible.
+12. The normalized request is built field-by-field from a closed known-field
+    list. Caller input is never spread into it, so no unrecognized key can reach
+    the runtime, an adapter, or the child process. An unknown field is rejected
+    as `invalid_request` naming the key rather than dropped, so a caller can
+    never believe an option applied when it did not.
+13. `createModelRuntime({ locked: [...] })` pins request fields to their
+    `defaults` value. A request that sets a locked field is rejected as
+    `invalid_request`. An embedder exposing this library to untrusted callers
+    should use `locked: ['mode', 'cwd', 'envPolicy', 'inheritConfig', 'env',
+    'addDirs']`; unlocked fields keep their previous caller-over-defaults
+    precedence.
+14. JSON recovery never fabricates an object. Beyond a bare JSON document, a
+    single JSON line, and a fenced block, the `{...}` brace scan is accepted
+    only when the discarded surrounding material contains no letters or digits.
+    Braces embedded in prose raise `invalid_output` instead of returning a
+    plausible object that a permissive schema would accept. The scan can be
+    disabled entirely with `allowBraceScan: false`.

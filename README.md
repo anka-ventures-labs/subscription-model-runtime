@@ -91,6 +91,21 @@ Python and shell consumers can send the same request as JSON over stdin:
 printf '%s' '{"provider":"codex","prompt":"Reply with one word"}' | smr
 ```
 
+Since 0.2.0 the request is validated against a closed field list. An unrecognized
+key is rejected as `invalid_request` naming the key, rather than silently ignored.
+This is a breaking change for payloads that carried extra fields.
+
+Embedders exposing this library to untrusted callers should pin the sensitive
+fields:
+
+```js
+createDefaultRuntime({
+  defaults: { mode: 'read-only', envPolicy: 'safe' },
+  locked: ['mode', 'cwd', 'envPolicy', 'inheritConfig', 'env', 'addDirs'],
+  allowBraceScan: false,
+})
+```
+
 Kimi does not currently provide sandboxed or ephemeral prompt mode. Inspect
 `runtime.capabilities('kimi')` before using it with sensitive workspaces.
 Omitting `tools` gives Claude its default tool set; passing `tools: []`

@@ -1,6 +1,6 @@
 {
   "name": "subscription-model-runtime",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Provider-neutral local runtime for subscription-authenticated model CLIs",
   "type": "module",
   "private": true,

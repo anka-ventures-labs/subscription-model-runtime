@@ -74,9 +74,23 @@ export type ProviderInvocation = {
   model?: string
 }
 
+export type LockableRequestField = keyof ModelRequest
+
 export type RuntimeOptions = {
   providers: Record<string, ProviderAdapter>
   defaults?: Partial<ModelRequest>
+  /**
+   * Request fields the caller may not set. A locked field always takes its value
+   * from `defaults`; a request that supplies one is rejected with
+   * `ModelRunError('invalid_request')`. A safe gateway configuration is
+   * `locked: ['mode', 'cwd', 'envPolicy', 'inheritConfig', 'env', 'addDirs']`.
+   */
+  locked?: LockableRequestField[]
+  /**
+   * Allow the last-resort `{...}` brace scan when recovering JSON from model
+   * output. Defaults to `true`. Set to `false` behind an untrusted boundary.
+   */
+  allowBraceScan?: boolean
   spawnFn?: (...args: any[]) => any
 }
 
@@ -108,4 +122,4 @@ export function createDefaultRuntime(options?: DefaultRuntimeOptions): ModelRunt
 export function createCodexAdapter(options?: Record<string, unknown>): ProviderAdapter
 export function createClaudeAdapter(options?: Record<string, unknown>): ProviderAdapter
 export function createKimiAdapter(options?: Record<string, unknown>): ProviderAdapter
-export function parseJsonObject(text: string): unknown
+export function parseJsonObject(text: string, options?: { allowBraceScan?: boolean }): unknown
